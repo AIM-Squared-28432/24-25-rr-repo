@@ -69,7 +69,7 @@ public class Drive_base extends Mechanism {
 
         // Create left stick vector
         Vector2d leftStick = new Vector2d(-y, x);
-        //i fucked this up
+        //i messed this up
 
 
         // Set drive powers
