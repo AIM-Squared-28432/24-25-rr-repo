@@ -5,18 +5,16 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.aimrobotics.aimlib.gamepad.AIMPad;
 import com.aimrobotics.aimlib.util.Mechanism;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.Settings.GamepadSettings;
 import org.firstinspires.ftc.teamcode.Settings.InputModification;
+import org.firstinspires.ftc.teamcode.opmodes.auto.AutoConstants;
 
 public class Drive_base extends Mechanism {
 
@@ -25,6 +23,7 @@ public class Drive_base extends Mechanism {
     private DcMotorEx frontrightDrive = null;
     private DcMotorEx backrightDrive = null;
     public MecanumDrive drive;
+//    AutoConstants constants = new AutoConstants();
 
 
     Pose2D targetPosition = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
@@ -37,9 +36,15 @@ public class Drive_base extends Mechanism {
 //        backrightDrive = hwMap.get(DcMotorEx.class, ConfigInfo.backrightDrive.getDeviceName());
 //    }
 
+    private Pose2d startingPose;
+    //so when you call robot it just uses what ever starting pose is put in there no need to put it into the new mechanum drive too becuase then it will cause issues like at supers
+    public Drive_base (Pose2d startingPose) {
+        this.startingPose = startingPose;
+    }
+
     @Override
     public void init(HardwareMap hwMap) {
-        drive = new MecanumDrive(hwMap, new Pose2d(new Vector2d(0, 0), 0));
+        drive = new MecanumDrive(hwMap, startingPose);
         setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -68,8 +73,8 @@ public class Drive_base extends Mechanism {
         double rx = InputModification.poweredInput(deadzonedStickInput(gamepad.getRightStickX()), GamepadSettings.EXPONENT_MODIFIER);
 
         // Create left stick vector
-        Vector2d leftStick = new Vector2d(-y, x);
-        //i messed this up
+        Vector2d leftStick = new Vector2d(y, -x);
+        //i this is the original way
 
 
         // Set drive powers

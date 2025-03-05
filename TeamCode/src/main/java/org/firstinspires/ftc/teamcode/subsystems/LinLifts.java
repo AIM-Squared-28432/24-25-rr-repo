@@ -6,19 +6,19 @@ import com.aimrobotics.aimlib.control.PIDController;
 import com.aimrobotics.aimlib.gamepad.AIMPad;
 import com.aimrobotics.aimlib.control.SimpleControlSystem;
 import com.aimrobotics.aimlib.util.Mechanism;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Settings.ConfigInfo;
+import org.firstinspires.ftc.teamcode.Settings.GamepadSettings;
 
 public class LinLifts extends Mechanism {
-    private final double kP = .001;
-    private final double kI = 0;
-    private final double kD = 0;
+    private final double kP = .011475;
+    private final double kI = 0.13815;
+    private final double kD = 0.00030;
     private final double derivativeLowPassGain = 0;
-    private final double integralSumMax = 0;
+    private final double integralSumMax = 0.16;
     private final double kV = 0;
     private final double kA = 0.0;
     private final double kStatic = 0.0;
@@ -39,17 +39,28 @@ public class LinLifts extends Mechanism {
     private static final double MINIMUM_POWER = 0.03;
 
 
-    enum SlidePosition {
+    public enum SlidePosition {
         FLOOR(0),
-        MID(100),
-        HIGH(300);
+        HANG(1500),
+        LOW_BUCKET(1800),
+        HANG_SPECIMEN(1200),
+        HANG_SPECIMEN_DOWN(1100);
 
-        private final int position;
-        SlidePosition(int position) {
+        public final int position;
+         SlidePosition(int position) {
             this.position = position;
         }
 
+
+
     }
+    public SlidePosition activeSlidesPosition = SlidePosition.FLOOR;
+
+    public enum llControlState {
+        MANUAL,
+        AUTONOMOUS
+    }
+    llControlState activeControlState = llControlState.AUTONOMOUS;
 
     public LinLifts() {
         PIDController pidController = new PIDController(kP, kI, kD, derivativeLowPassGain, integralSumMax);
@@ -68,8 +79,8 @@ public class LinLifts extends Mechanism {
 
         setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-//        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         activeEncoderMotor = leftSlide;
@@ -77,8 +88,14 @@ public class LinLifts extends Mechanism {
 
     @Override
     public void loop (AIMPad gamepad) {
-//        applyManualPower();
-        update();
+        switch (activeControlState) {
+            case AUTONOMOUS:
+                update();
+                break;
+            case MANUAL:
+                applyManualPower();
+                break;
+        }
     }
 
     /**
@@ -99,6 +116,9 @@ public class LinLifts extends Mechanism {
         rightSlide.setZeroPowerBehavior(behavior);
     }
 
+    public void setActiveControlState(llControlState state) {
+        activeControlState = state;
+    }
 
     /**
      * Get the output power of the slides based on the system update for the active target position
@@ -122,8 +142,9 @@ public class LinLifts extends Mechanism {
     /**
      * Hold the position of the slides
      */
+    //TODO fix this too
     private void holdPosition() {
-        setTargetPosition(getLastPosition());
+        setTargetPositionManual(getLastPosition());
         update();
     }
 
@@ -131,9 +152,15 @@ public class LinLifts extends Mechanism {
 
     /**
      * Set the target position for the slides
-     * @param targetPosition the target position for the slides
+//     * @param targetPosition the target position for the slides
      */
-    public void setTargetPosition(double targetPosition) {
+    //TODO changing this to the enum but just copy the original and make it different
+    public void setTargetPosition(SlidePosition targetPreset) {
+        activeTargetPosition = targetPreset.position;
+        activeSlidesPosition = targetPreset;
+        controlSystem.setTarget(activeTargetPosition);
+    }
+    public void setTargetPositionManual(double targetPosition) {
         activeTargetPosition = targetPosition;
         controlSystem.setTarget(activeTargetPosition);
     }
@@ -144,7 +171,7 @@ public class LinLifts extends Mechanism {
      * Slides will likely be running every loop
      * @param power the power to set the slides to
      */
-    private void setPower(double power) {
+    public void setPower(double power) {
         leftSlide.setPower(power);
         rightSlide.setPower(power);
         updateLastPosition();
@@ -154,6 +181,7 @@ public class LinLifts extends Mechanism {
      * @param power the power to set the slides to
      */
     public void updateManualPower(double power) {
+        setActiveControlState(llControlState.MANUAL);
         manualPower = power;
     }
     /**
@@ -161,11 +189,12 @@ public class LinLifts extends Mechanism {
      * Use with updateManualPower() to set the manual power
      */
     private void applyManualPower() {
-        if (Math.abs(manualPower) > MINIMUM_POWER) {
+//        if (Math.abs(manualPower) > MINIMUM_POWER) {
             setPower(manualPower);
-        } else {
-            holdPosition();
-        }
+//        } else {
+//
+//            holdPosition();
+//        }
     }
 
     /**
@@ -188,6 +217,18 @@ public class LinLifts extends Mechanism {
     private void updateLastPosition() {
         lastActiveEncoderPosition = activeEncoderMotor.getCurrentPosition();
     }
+    public boolean isAtTargetPosition () {
+        return Math.abs(getCurrentPosition() - activeTargetPosition) < GamepadSettings.PROXIMITY_THRESHOLD;
+    }
+    //TODO add this + all the extention stuff nate added basically double everythign for ticks and inches (extiontions)
+//    public boolean currentSpikeDetected() {
+//        return activeEncoderMotor.getCurrent(CurrentUnit.MILLIAMPS) > CURRENT_THRESHOLD;
+//    }
+//
+//    private double ticksToInches(double ticks) {
+//        return ticks / TICKS_PER_INCH;
+//    }
+
 
 
 //    public void updateLift () {

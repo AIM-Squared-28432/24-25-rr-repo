@@ -79,8 +79,8 @@ android {
         matcher.find()
         def vName = matcher.group(1)
         //
-        versionCode vCode
-        versionName vName
+        versionCode 1
+        versionName '1'
     }
 
     // http://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.BuildType.html

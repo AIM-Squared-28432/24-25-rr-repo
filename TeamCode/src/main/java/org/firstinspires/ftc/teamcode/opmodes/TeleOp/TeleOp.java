@@ -27,14 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.TeleOp;
 
-import com.aimrobotics.aimlib.control.PIDController;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.aimrobotics.aimlib.gamepad.AIMPad;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.subsystems.LinLifts;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 /*
@@ -61,9 +59,10 @@ public class TeleOp extends OpMode
     AIMPad aimPad1;
     AIMPad aimPad2;
 
+
     @Override
     public void init() {
-        robot = new Robot();
+        robot = new Robot( new Pose2d(0, 0, 0), false);
         robot.init(hardwareMap);
         aimPad1 = new AIMPad(gamepad1);
         aimPad2 = new AIMPad(gamepad2);
@@ -81,8 +80,8 @@ public class TeleOp extends OpMode
         aimPad1.update(gamepad1);
         aimPad2.update(gamepad2);
 
-        telemetry.addData("Previous State", aimPad1.getPreviousState());
-        telemetry.addData("Current State", aimPad1.getCurrentState());
+        telemetry.addData("Previous State", aimPad2.getPreviousState());
+        telemetry.addData("Current State", aimPad2.getCurrentState());
 //        robot.telemetry(telemetry);
         telemetry.update();
     }

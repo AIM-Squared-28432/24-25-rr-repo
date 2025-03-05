@@ -59,7 +59,7 @@ public final class MecanumDrive {
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
 
         // drive model parameters
         public double inPerTick = 0.001975615263;
@@ -72,7 +72,8 @@ public final class MecanumDrive {
         public double kA = 0.000012;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
+        public double maxWheelVel = 120;
+        //caps out around 100-120
         public double minProfileAccel = -30;
         public double maxProfileAccel = 50;
 
@@ -238,7 +239,7 @@ public final class MecanumDrive {
 
         rightFront.setDirection(DcMotorEx.Direction.FORWARD);
         rightBack.setDirection(DcMotorEx.Direction.FORWARD);
-        leftFront.setDirection(DcMotorEx.Direction.FORWARD);
+        leftFront.setDirection(DcMotorEx.Direction.REVERSE);
         leftBack.setDirection(DcMotorEx.Direction.REVERSE);
         // TODO: reverse motor directions if needed
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -254,6 +255,7 @@ public final class MecanumDrive {
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
+
 
     public void setDrivePowers(PoseVelocity2d powers) {
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(

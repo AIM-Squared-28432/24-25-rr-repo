@@ -1,13 +1,6 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
-import com.acmerobotics.roadrunner.Trajectory;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.aimrobotics.aimlib.gamepad.AIMPad;
@@ -18,11 +11,11 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 
-@Autonomous(name = "Autofirsttest", group = "AAA_COMP", preselectTeleOp="teleop")
-public final class Auto extends LinearOpMode {
+@Autonomous(name = "Auto high basket park", group = "AAA_COMP", preselectTeleOp="teleop")
+public final class Autohighbasketpark extends LinearOpMode {
 
     AutoConstants constants = new AutoConstants();
-    Robot robot = new Robot();
+    Robot robot = new Robot(constants.startingPose,true);
 
     AIMPad aimPad1;
     AIMPad aimPad2;
@@ -56,6 +49,8 @@ public final class Auto extends LinearOpMode {
 //                .build();
 
         Action traj2 = robot.db.drive.actionBuilder(constants.zero)
+                .waitSeconds(25)
+
                 .strafeTo(constants.test.position)
                 .build();
 

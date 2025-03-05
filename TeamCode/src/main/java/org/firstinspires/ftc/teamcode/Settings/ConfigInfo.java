@@ -4,19 +4,19 @@ import com.aimrobotics.aimlib.util.HardwareInterface;
 
 public class ConfigInfo {
     //Slides
-    public static HardwareInterface leftSlide = new HardwareInterface ("LS", false,0);
-    public static HardwareInterface rightSlide = new HardwareInterface ("RS", false,0);
+    public static HardwareInterface leftSlide = new HardwareInterface ("LL", false,0);
+    public static HardwareInterface rightSlide = new HardwareInterface ("RL", false,0);
 
-    //Arm
-    public static HardwareInterface leftArm = new HardwareInterface ("LA", false, 0);
-    public static HardwareInterface rightArm = new HardwareInterface ("RA", false, 0);
+    //Pivot (rename all stuff later)
+    public static HardwareInterface leftArm = new HardwareInterface ("LR", false, 0);
+    public static HardwareInterface rightArm = new HardwareInterface ("RR", false, 0);
 
     //INTAKE
     public static HardwareInterface hand = new HardwareInterface ("HA", false, 0);
     public static HardwareInterface wrist = new HardwareInterface ("WR", false, 0);
 
-    //ODOMETRY
-    public static HardwareInterface odo = new HardwareInterface("ODO", false, 0);
+    //ODOMETRY not used
+//    public static HardwareInterface odo = new HardwareInterface("ODO", false, 0);
 
     //DRIVEBASE
 

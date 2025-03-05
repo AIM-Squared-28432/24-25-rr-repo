@@ -36,10 +36,3 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
-repositories {
-    maven { url = 'https://maven.brott.dev/' }
-}
-
-dependencies {
-    implementation 'com.acmerobotics.roadrunner:MeepMeep:0.1.6'
-}

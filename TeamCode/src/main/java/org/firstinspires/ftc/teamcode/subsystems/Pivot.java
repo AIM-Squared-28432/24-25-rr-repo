@@ -6,26 +6,23 @@ import com.aimrobotics.aimlib.control.PIDController;
 import com.aimrobotics.aimlib.control.SimpleControlSystem;
 import com.aimrobotics.aimlib.gamepad.AIMPad;
 import com.aimrobotics.aimlib.util.Mechanism;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Settings.ConfigInfo;
+import org.firstinspires.ftc.teamcode.Settings.GamepadSettings;
 
-public class Arm extends Mechanism {
+public class Pivot extends Mechanism {
     public DcMotorEx rightArm;
     public DcMotorEx leftArm;
-    //LEFT OFF HERE
-//    private CRServo hand;
 
-    //ku = .012
-    //tu = 1.3
-
-    private final double kP = 0.001;
-    private final double kI = 0.0001;
-    private final double kD = 0.0001;
+    // CONTROLLER CONSTANTS
+    //TODO tune pivot and slides and other stuff
+    private final double kP = 0.00045;
+    private final double kI = 0.0000082;
+    private final double kD = 0.00007;
     private final  double derivativeLowPassGain = 0;
     private final double integralSumMax = 0;
     private final double kV = 0;
@@ -34,15 +31,40 @@ public class Arm extends Mechanism {
     private final double kCos = 0;
     private final double kG = 0;
     private final double lowPassGain = 0;
+    private final SimpleControlSystem controlSystem;
+    //==========================================================
+
     public double activeTargetPosition = 0;
     private DcMotorEx activeEncoderMotor;
-    // set to a motor
     private double lastActiveEncoderPosition;
-    private final SimpleControlSystem controlSystem;
-    private final double startingOffset = 0;
-// what is happening
+    private double MINIMUM_POWER = .3;
+    private double manualPower = 0;
 
-    //    Servo wrist = null;
+    private final double startingOffset = 0;
+
+    // PIVOT TARGET POS ENUMS
+    //TODO input the positions
+    //TODO convert ticks to angles
+    //TODO maybe set states ie auto (using PID) and manual (setting power)
+
+    public enum pivotPosition {
+        PERP(0),
+        ABOVE_PAR(220),
+        PAR(320),
+        HANG_SPECIMEN(100),
+        LOW_BUCKET(100),
+        HANG(150);
+
+        public final double position;
+        pivotPosition(double position) {this.position = position;}
+
+    }
+    public pivotPosition activePivotTarget = pivotPosition.PERP;
+
+
+
+
+
     @Override
     public void init (HardwareMap hwMap) {
         rightArm = hwMap.get(DcMotorEx.class, ConfigInfo.rightArm.getDeviceName());
@@ -50,12 +72,12 @@ public class Arm extends Mechanism {
         setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        rightArm.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightArm.setDirection(DcMotorSimple.Direction.REVERSE);
         leftArm.setDirection(DcMotorSimple.Direction.REVERSE);
         activeEncoderMotor = rightArm;
     }
 
-    public Arm() {
+    public Pivot() {
         PIDController pidController = new PIDController(kP, kI, kD, derivativeLowPassGain, integralSumMax);
         FeedforwardController feedforwardController = new FeedforwardController(kV, kA, kStatic, kCos, kG);
         LowPassFilter lowPassFilter = new LowPassFilter(lowPassGain);
@@ -63,6 +85,8 @@ public class Arm extends Mechanism {
     }
     public void loop (AIMPad gamepad) {
         update();
+
+        applyManualPower();
     }
 
     /** Set the zero power behavior of the slides
@@ -90,7 +114,7 @@ public class Arm extends Mechanism {
      * Slides will likely be running every loop
      * @param power the power to set the slides to
      */
-    private void setPower(double power) {
+    public void setPower(double power) {
         leftArm.setPower(power);
         rightArm.setPower(power);
         updateLastPosition();
@@ -113,12 +137,17 @@ public class Arm extends Mechanism {
 
     /**
      * Set the target position for the slides
-     * @param targetPosition the target position for the slides
+//     * @param targetPosition the target position for the slides
      */
-    public void setTargetPosition(double targetPosition) {
-//        double targetTicks = degToTicks(targetPosition) - degToTicks(startingOffset);
-//        activeTargetPosition = targetTicks;
-        activeTargetPosition = targetPosition;
+//    public void setTargetPosition(double targetPosition) {
+////        double targetTicks = degToTicks(targetPosition) - degToTicks(startingOffset);
+////        activeTargetPosition = targetTicks;
+//        activeTargetPosition = targetPosition;
+//        controlSystem.setTarget(activeTargetPosition);
+//    }
+    //TODO changing this to the enum but just copy the original and make it different
+    public void setTargetPosition(Pivot.pivotPosition targetPreset) {
+        activeTargetPosition = targetPreset.position;
         controlSystem.setTarget(activeTargetPosition);
     }
 
@@ -129,10 +158,11 @@ public class Arm extends Mechanism {
     /**
      * Hold the position of the slides
      */
-    private void holdPosition() {
-        setTargetPosition(getLastPosition());
-        update();
-    }
+    //TODO fix this too
+//    private void holdPosition() {
+//        setTargetPosition(getLastPosition());
+//        update();
+//    }
 
     /**
      * Get the current position of the slides
@@ -153,6 +183,23 @@ public class Arm extends Mechanism {
      */
     private void updateLastPosition() {
         lastActiveEncoderPosition = activeEncoderMotor.getCurrentPosition();
+    }
+
+    public boolean isAtTargetPosition () {
+        return Math.abs(getCurrentPosition() - activeTargetPosition) < GamepadSettings.PROXIMITY_THRESHOLD;
+    }
+
+
+    public void updateManualPower(double power) {
+        manualPower = power;
+    }
+    public void applyManualPower() {
+        if (Math.abs(manualPower) > MINIMUM_POWER) {
+            setPower(manualPower);
+        } else {
+            //TODO un comment this
+//            holdPosition();
+        }
     }
 
 //    void spinOut() {
