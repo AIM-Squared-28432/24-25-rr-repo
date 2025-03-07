@@ -36,15 +36,11 @@ public class ScoringAssembly extends Mechanism {
         ll.telemetry((telemetry));
     }
 
-    //set all meathods for calling later
-
-
     public void fullFix () {
         arm.neutralOpen();
         ll.setTargetPosition(LinLifts.SlidePosition.FLOOR);
         pivot.setTargetPosition(Pivot.pivotPosition.PERP);
     }
-    //TODO for spec lifts cant be all the way down i think
 
     public void startSearch() {
 //        arm.neutralClosed();
@@ -65,7 +61,6 @@ public class ScoringAssembly extends Mechanism {
         ll.setTargetPosition(LinLifts.SlidePosition.FLOOR);
         pivot.setTargetPosition(Pivot.pivotPosition.ABOVE_PAR);
     }
-    //drop specimen is exact same as end search but in robot i will give drop specimen access to manual control of slides
     public void dropSpecimen() {
 //        arm.neutralClosed();
         ll.setTargetPosition(LinLifts.SlidePosition.FLOOR);
@@ -84,11 +79,6 @@ public class ScoringAssembly extends Mechanism {
         pivot.setTargetPosition(Pivot.pivotPosition.HANG_SPECIMEN);
     }
 
-//    public void hangSpecimen() {
-//        arm.hangSpecimen();
-//        ll.setTargetPosition(LinLifts.SlidePosition.HANG_SPECIMEN);
-//        pivot.setTargetPosition(Pivot.pivotPosition.HANG_SPECIMEN);
-//    }
 
     public void outtakeLowPrep() {
         arm.neutralClosed();

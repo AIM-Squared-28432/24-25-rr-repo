@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Settings.ConfigInfo;
 import org.firstinspires.ftc.teamcode.Settings.GamepadSettings;
 
 public class Pivot extends Mechanism {
-    public DcMotorEx rightArm;
-    public DcMotorEx leftArm;
+    public DcMotorEx rightPivot;
+    public DcMotorEx leftPivot;
 
     // CONTROLLER CONSTANTS
     //TODO tune pivot and slides and other stuff
@@ -24,7 +24,7 @@ public class Pivot extends Mechanism {
     private final double kI = 0.0000082;
     private final double kD = 0.00007;
     private final  double derivativeLowPassGain = 0;
-    private final double integralSumMax = 0;
+    private final double integralSumMax = 36585.3658537;
     private final double kV = 0;
     private final double kA = 0;
     private final double kStatic = 0;
@@ -43,10 +43,6 @@ public class Pivot extends Mechanism {
     private final double startingOffset = 0;
 
     // PIVOT TARGET POS ENUMS
-    //TODO input the positions
-    //TODO convert ticks to angles
-    //TODO maybe set states ie auto (using PID) and manual (setting power)
-
     public enum pivotPosition {
         PERP(0),
         ABOVE_PAR(220),
@@ -61,20 +57,16 @@ public class Pivot extends Mechanism {
     }
     public pivotPosition activePivotTarget = pivotPosition.PERP;
 
-
-
-
-
     @Override
     public void init (HardwareMap hwMap) {
-        rightArm = hwMap.get(DcMotorEx.class, ConfigInfo.rightArm.getDeviceName());
-        leftArm = hwMap.get(DcMotorEx.class, ConfigInfo.leftArm.getDeviceName());
+        rightPivot = hwMap.get(DcMotorEx.class, ConfigInfo.rightArm.getDeviceName());
+        leftPivot = hwMap.get(DcMotorEx.class, ConfigInfo.leftArm.getDeviceName());
         setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightArm.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftArm.setDirection(DcMotorSimple.Direction.REVERSE);
-        activeEncoderMotor = rightArm;
+        rightPivot.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftPivot.setDirection(DcMotorSimple.Direction.REVERSE);
+        activeEncoderMotor = rightPivot;
     }
 
     public Pivot() {
@@ -85,7 +77,6 @@ public class Pivot extends Mechanism {
     }
     public void loop (AIMPad gamepad) {
         update();
-
         applyManualPower();
     }
 
@@ -93,8 +84,8 @@ public class Pivot extends Mechanism {
      * @param behavior the zero power behavior to set the slides to
      */
     public void setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior behavior) {
-        leftArm.setZeroPowerBehavior(behavior);
-        rightArm.setZeroPowerBehavior(behavior);
+        leftPivot.setZeroPowerBehavior(behavior);
+        rightPivot.setZeroPowerBehavior(behavior);
     }
 
     /**
@@ -102,11 +93,9 @@ public class Pivot extends Mechanism {
      * @param mode the mode to set the slides to
      */
     public void setMode(DcMotorEx.RunMode mode) {
-        leftArm.setMode(mode);
-        rightArm.setMode(mode);
+        leftPivot.setMode(mode);
+        rightPivot.setMode(mode);
     }
-
-
 
     /**
      * Set the power of the slides and update the last position
@@ -115,8 +104,8 @@ public class Pivot extends Mechanism {
      * @param power the power to set the slides to
      */
     public void setPower(double power) {
-        leftArm.setPower(power);
-        rightArm.setPower(power);
+        leftPivot.setPower(power);
+        rightPivot.setPower(power);
         updateLastPosition();
     }
 
@@ -137,33 +126,12 @@ public class Pivot extends Mechanism {
 
     /**
      * Set the target position for the slides
-//     * @param targetPosition the target position for the slides
+//     * @param targetPreset the target position for the slides
      */
-//    public void setTargetPosition(double targetPosition) {
-////        double targetTicks = degToTicks(targetPosition) - degToTicks(startingOffset);
-////        activeTargetPosition = targetTicks;
-//        activeTargetPosition = targetPosition;
-//        controlSystem.setTarget(activeTargetPosition);
-//    }
-    //TODO changing this to the enum but just copy the original and make it different
     public void setTargetPosition(Pivot.pivotPosition targetPreset) {
         activeTargetPosition = targetPreset.position;
         controlSystem.setTarget(activeTargetPosition);
     }
-
-    private double degToTicks(double targetPosition) {
-        return 1425.1/360 * targetPosition;
-    }
-
-    /**
-     * Hold the position of the slides
-     */
-    //TODO fix this too
-//    private void holdPosition() {
-//        setTargetPosition(getLastPosition());
-//        update();
-//    }
-
     /**
      * Get the current position of the slides
      * @return the current position of the slides
@@ -189,43 +157,13 @@ public class Pivot extends Mechanism {
         return Math.abs(getCurrentPosition() - activeTargetPosition) < GamepadSettings.PROXIMITY_THRESHOLD;
     }
 
-
     public void updateManualPower(double power) {
         manualPower = power;
     }
     public void applyManualPower() {
         if (Math.abs(manualPower) > MINIMUM_POWER) {
             setPower(manualPower);
-        } else {
-            //TODO un comment this
-//            holdPosition();
         }
     }
-
-//    void spinOut() {
-//        hand.setPower(1);
-//    }
-//    void spinIn() {
-//        hand.setPower(-1);
-//    }
-//    void spinOff() {
-//        hand.setPower(0);
-//    }
-//
-//    void spinAtPower(double power) {
-//        hand.setPower(power);
-//    }
-//
-//    void updateArm() {
-//        double error = targetPosition - arm.getCurrentPosition();
-//
-//        double power = error * kP;
-//        arm.setPower(power);
-////        wrist.setPosition(0);
-//    }
-//
-//    void setPosition(double target) {
-//        targetPosition = target;
-//    }
 }
 

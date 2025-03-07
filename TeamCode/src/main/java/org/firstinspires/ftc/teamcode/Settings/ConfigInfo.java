@@ -15,11 +15,7 @@ public class ConfigInfo {
     public static HardwareInterface hand = new HardwareInterface ("HA", false, 0);
     public static HardwareInterface wrist = new HardwareInterface ("WR", false, 0);
 
-    //ODOMETRY not used
-//    public static HardwareInterface odo = new HardwareInterface("ODO", false, 0);
-
     //DRIVEBASE
-
     public static HardwareInterface frontleftDrive = new HardwareInterface("leftFront", false,0);
     public static HardwareInterface frontrightDrive = new HardwareInterface("rightFront", false,0);
     public static HardwareInterface backleftDrive = new HardwareInterface("leftBack", false,0);

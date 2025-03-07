@@ -9,43 +9,34 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Settings.InputHandler;
 
 public class Robot extends Mechanism {
-    //TODO organize in scoring assembly and drivebase
-    // why make this a new drivebase or just initialize but why does he make a new one in the robot constructor
     public Drive_base db;
-    //TODO ask why
-    // need constructors for other things too?
     public ScoringAssembly scorer = new ScoringAssembly();
     InputHandler inputHandler = new InputHandler();
 
-    boolean isAuto = false;
-    //what do we use is auto for?
+    boolean isAuto;
     Pose2d startingPose;
-    //TODO do i need this in this class?? yes i think because then when ever you call a robot you can modify the starting pose for the mechanum drive
 
     public Robot (Pose2d startingPose, boolean isAuto) {
         this.startingPose = startingPose;
         this.isAuto = isAuto;
         db = new Drive_base(startingPose);
     }
-    // not needed i think
-
-//    public Robot(boolean isAuto) {
-//        this.isAuto = isAuto;
-//    }
+    public Robot(boolean isAuto) {
+        this.isAuto = isAuto;
+    }
 
     enum RobotState {
-        //TODO enter all the overarching states the robot could be in
         RESETTING,
         SEARCHING,
         DROP_SPECIMEN,
         SCORE_PREPING,
         SCOREING,
-        HANGING;
+        HANGING
     }
 
     enum ScoringElement {
         SPECIMEN,
-        SAMPLE;
+        SAMPLE
     }
     ScoringElement activeScoringElementType = ScoringElement.SPECIMEN;
 
@@ -54,7 +45,6 @@ public class Robot extends Mechanism {
 
     @Override
     public void init(HardwareMap hwMap) {
-//        scorer = new ScoringAssembly();
         db.init(hwMap);
         scorer.init(hwMap);
     }
@@ -88,8 +78,6 @@ public class Robot extends Mechanism {
             }
 
             if (inputHandler.TOGGLE_HANG) {
-                //find a way to get 0 to be the slide extention: FLOOR
-
                 if (scorer.ll.getCurrentPosition() == 0) {
                     scorer.ll.setTargetPosition(LinLifts.SlidePosition.HANG);
                 } else {
@@ -98,9 +86,6 @@ public class Robot extends Mechanism {
             }
         }
     }
-
-    //meathods for each state that call from the indivisual classes and from the input handler
-
     private void resettingState() {
 
             scorer.startSearch();
@@ -160,7 +145,6 @@ public class Robot extends Mechanism {
         if (inputHandler.TOGGLE_HAND) {
             scorer.arm.hand.open();
 
-            // this is the issue
         }
         if (inputHandler.SPECIMEN_ADVANCE) {
             activeState = RobotState.SEARCHING;
@@ -261,8 +245,6 @@ public class Robot extends Mechanism {
     }
     private void hangState() {
         if (inputHandler.TOGGLE_HANG) {
-            //find a way to get 0 to be the slide extention: FLOOR
-
             if (scorer.ll.getCurrentPosition() == 0) {
             scorer.ll.setTargetPosition(LinLifts.SlidePosition.HANG);
             } else {

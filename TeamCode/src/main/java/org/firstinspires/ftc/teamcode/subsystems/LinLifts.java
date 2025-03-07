@@ -128,8 +128,6 @@ public class LinLifts extends Mechanism {
         return controlSystem.update(getCurrentPosition());
     }
 
-
-// not a way of setting power but updating the outb[ut according to how it was previously
     /**
      * Update the power of the slides based on the control system's output
      */
@@ -137,24 +135,17 @@ public class LinLifts extends Mechanism {
         double power = getTargetOutputPower();
         setPower(power);
     }
-
-
     /**
      * Hold the position of the slides
      */
-    //TODO fix this too
     private void holdPosition() {
         setTargetPositionManual(getLastPosition());
         update();
     }
-
-
-
     /**
      * Set the target position for the slides
 //     * @param targetPosition the target position for the slides
      */
-    //TODO changing this to the enum but just copy the original and make it different
     public void setTargetPosition(SlidePosition targetPreset) {
         activeTargetPosition = targetPreset.position;
         activeSlidesPosition = targetPreset;
@@ -189,12 +180,9 @@ public class LinLifts extends Mechanism {
      * Use with updateManualPower() to set the manual power
      */
     private void applyManualPower() {
-//        if (Math.abs(manualPower) > MINIMUM_POWER) {
+        if (Math.abs(manualPower) > MINIMUM_POWER) {
             setPower(manualPower);
-//        } else {
-//
-//            holdPosition();
-//        }
+        }
     }
 
     /**
@@ -220,24 +208,4 @@ public class LinLifts extends Mechanism {
     public boolean isAtTargetPosition () {
         return Math.abs(getCurrentPosition() - activeTargetPosition) < GamepadSettings.PROXIMITY_THRESHOLD;
     }
-    //TODO add this + all the extention stuff nate added basically double everythign for ticks and inches (extiontions)
-//    public boolean currentSpikeDetected() {
-//        return activeEncoderMotor.getCurrent(CurrentUnit.MILLIAMPS) > CURRENT_THRESHOLD;
-//    }
-//
-//    private double ticksToInches(double ticks) {
-//        return ticks / TICKS_PER_INCH;
-//    }
-
-
-
-//    public void updateLift () {
-//        double error = targetPosition - lift.getCurrentPosition();
-//
-//        double power = error * kP;
-//        lift.setPower(power);
-//    }
-//    void setLift (double target) {
-//        targetPosition = target;
-//    }
 }
